@@ -1,0 +1,29 @@
+    - name: "retrieve gateways & servers"
+      uri:
+        url: 'https://{{ inventory_hostname }}/web_api/show-gateways-and-servers'
+        timeout: 120
+        method: POST
+        validate_certs: no
+        headers:
+         Content-Type: application/json
+         X-chkp-sid: "{{ global_sid }}"
+        body_format: json
+        body:
+          details-level: "full"
+          limit: "500"
+          offset: "{{ item }}"
+      register: devices
+
+    - name: "set variable"
+      set_fact: filtered_devices={{ devices.json.objects|json_query('[*].[name, \"ipv4-address\", type, version, policy.\"access-policy-name\", domain.name]') }}
+
+    - name: "create directory"
+      file:
+        path: ./output
+        state: directory
+        mode: '755'
+
+    - name: "create .csv from .json"
+      template:
+       src: csv.j2
+       dest: ./output/{{ inventory_hostname }}.{{ item }}.csv

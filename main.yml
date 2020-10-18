@@ -1,0 +1,11 @@
+- name: "mds devices report"
+  connection: local
+  gather_facts: yes
+  serial: 1
+  hosts: all
+
+  tasks:
+     - import_tasks: auth.yml
+     - import_tasks: global_login.yml
+     - include_tasks: show_gateways_servers.yml
+       with_items: "{{ offset }}"

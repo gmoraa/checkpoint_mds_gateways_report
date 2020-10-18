@@ -1,0 +1,17 @@
+    - name: "create global session"
+      uri:
+        url: 'https://{{ inventory_hostname }}/web_api/login'
+        method: POST
+        validate_certs: no
+        headers:
+         Content-Type: application/json
+        body_format: json
+        body:
+          user: "{{ checkpoint_user }}"
+          password: "{{ checkpoint_password }}"
+          domain: ""
+      register: g_sid
+      check_mode: false
+
+    - name: "set global session"
+      set_fact: global_sid={{ g_sid.json.sid }}
